@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 첫 홈페이지</title>
+  <style>
+    @font-face {
+      font-family: 'Cafe24LovingU';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2405-3@1.1/Cafe24Lovingu.woff2') format('woff2');
+      font-display: swap;
+    }
+
+    .profile-email {
+      display: inline-block;
+      max-width: calc(100% - 2rem);
+      box-sizing: border-box;
+      padding: 0.4rem 1rem;
+      border: 1px solid #a8c9e3;
+      border-radius: 999px;
+      background-color: #f5faff;
+      color: #244763;
+      font-family: 'Cafe24LovingU', 'Segoe Print', cursive;
+      font-size: clamp(1.2rem, 5vw, 1.6rem);
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+
+    .profile-email:hover,
+    .profile-email:focus-visible {
+      color: #123451;
+      background-color: #fff;
+      text-decoration: underline;
+    }
+
+    body {
+      background-color: #d9efff;
+      text-align: center;
+    }
+    .profile-photo {
+      width: 160px;
+      height: 160px;
+      object-fit: cover;
+      object-position: center 35%;
+      border-radius: 50%;
+      display: block;
+      margin: 32px auto 0;
+    }
+    .profile-blog-row {
+      margin-top: -0.35rem;
+    }
+
+    @property --blog-glow-angle {
+      syntax: "<angle>";
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    @keyframes blog-glow {
+      to { --blog-glow-angle: 360deg; }
+    }
+
+    @keyframes blog-ripple {
+      from { scale: 0; opacity: 0.65; }
+      to { scale: 1; opacity: 0; }
+    }
+
+    .profile-blog {
+      display: inline-block;
+      max-width: 100%;
+      padding: 2px;
+      box-sizing: border-box;
+      border-radius: 999px;
+      background: #9cbfdb;
+      background: conic-gradient(from var(--blog-glow-angle, 0deg), #a0b9f9, #f5ecff, #7ed9ed, #a0b9f9);
+      box-shadow: 0 2px 14px #87b6e880;
+      color: #244763;
+      font: 600 0.95rem system-ui, sans-serif;
+      text-decoration: none;
+      transform: translate(var(--blog-x, 0px), var(--blog-y, 0px));
+      transition: transform 180ms ease-out;
+      animation: blog-glow 3s linear infinite;
+    }
+
+    .profile-blog-face {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.05rem;
+      overflow: hidden;
+      border-radius: inherit;
+      background: radial-gradient(85px circle at var(--blog-light-x, 50%) var(--blog-light-y, 50%), #fff, #eef8ff);
+    }
+
+    .profile-blog:hover,
+    .profile-blog:focus-visible {
+      text-decoration: underline;
+    }
+
+    .profile-blog:focus-visible {
+      outline: 2px solid #244763;
+      outline-offset: 4px;
+    }
+
+    .profile-blog-ripple {
+      position: absolute;
+      width: 10rem;
+      height: 10rem;
+      border-radius: 50%;
+      background: #a4d7f6;
+      translate: -50% -50%;
+      pointer-events: none;
+      animation: blog-ripple 450ms ease-out forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .profile-blog {
+        animation: none;
+        transform: none;
+        transition: none;
+      }
+
+      .profile-blog-ripple {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img class="profile-photo" src="profile.png" alt="&#54532;&#47196;&#54596;&#32;&#49324;&#51652;">
+  <p><a class="profile-email" href="mailto:dmstj8623@naver.com">dmstj8623@naver.com</a></p>
+  <p class="profile-blog-row"><a class="profile-blog" href="https://blog.naver.com/euun_off"><span class="profile-blog-face">네이버 블로그 <span aria-hidden="true">&#8594;</span></span></a></p>
+  <h1>안녕하세요!</h1>
+  <p>나의 첫 번째 웹사이트입니다.</p>
+  <script>
+    const blogLink = document.querySelector('.profile-blog');
+    const blogFace = blogLink.querySelector('.profile-blog-face');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+    function resetBlogMotion() {
+      ['--blog-x', '--blog-y', '--blog-light-x', '--blog-light-y'].forEach(property => {
+        blogLink.style.removeProperty(property);
+      });
+    }
+
+    blogLink.addEventListener('pointermove', event => {
+      if (event.pointerType === 'touch' || reducedMotion.matches) return;
+
+      const rect = blogLink.getBoundingClientRect();
+      const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+      blogLink.style.setProperty('--blog-x', ((x - 0.5) * 12) + 'px');
+      blogLink.style.setProperty('--blog-y', ((y - 0.5) * 12) + 'px');
+      blogLink.style.setProperty('--blog-light-x', (x * 100) + '%');
+      blogLink.style.setProperty('--blog-light-y', (y * 100) + '%');
+    });
+
+    blogLink.addEventListener('pointerleave', resetBlogMotion);
+    blogLink.addEventListener('pointercancel', resetBlogMotion);
+    reducedMotion.addEventListener('change', () => {
+      resetBlogMotion();
+      blogFace.querySelectorAll('.profile-blog-ripple').forEach(ripple => ripple.remove());
+    });
+
+    blogLink.addEventListener('pointerdown', event => {
+      if (event.button !== 0 || reducedMotion.matches) return;
+
+      const rect = blogFace.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'profile-blog-ripple';
+      ripple.setAttribute('aria-hidden', 'true');
+      ripple.style.left = (event.clientX - rect.left) + 'px';
+      ripple.style.top = (event.clientY - rect.top) + 'px';
+      ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+      blogFace.append(ripple);
+    });
+  </script>
+</body>
+</html>
